@@ -99,6 +99,6 @@ These results use a test fleet of 60,000 units per truck, 70 km/h and €1.10 pe
 
 No solution violates the capacity or expiry constraints. Some orders cannot reach their destination before expiring, even on a direct route, so they are reported as infeasible and excluded from the plan. This affects 10 orders in S1, 39 in S2 and 62 in S3 (see section 7.3 of the project report).
 
-## Author
+## Creators
 
-Maxime Pol Marcet
+Adam Serroukh Kharchich, Marvin Esteban Gonzales & Maxime Pol Marcet
