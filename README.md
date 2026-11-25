@@ -4,7 +4,7 @@
 
 Delivery planning and route optimization platform for perishable goods.
 
-SynapLogix is being developed for IA DELIVERY SL, a manufacturer of short-shelf-life food products based in Mataró (Barcelona). The company currently outsources its deliveries and wants to bring them in-house with the smallest possible fleet of its own trucks. SynapLogix calculates the minimum number of trucks needed to serve every order across mainland Spain, mainland Portugal and Andorra, and guarantees that each order arrives before its most perishable product expires.
+SynapLogix is being developed for IA DELIVERY SL, a manufacturer of short-shelf-life food products based in Mataró (Barcelona). The company currently outsources its deliveries and wants to bring them in-house with the smallest possible fleet of its own trucks. SynapLogix calculates the minimum number of trucks needed to serve every order across mainland Spain (Portugal and Andorra are out of scope), and guarantees that each order arrives before its most perishable product expires.
 
 ## The problem
 
@@ -29,18 +29,30 @@ A truck leaves Mataró at 08:00 on the latest ready date among the orders it car
 
 ## Current status
 
-The calculation core is implemented in Python and covered by unit tests:
+| Part | Status |
+|------|--------|
+| Calculation core (Python) | Done and covered by unit tests |
+| Web interface (React) | Done, running on mock data until the API exists |
+| REST API (FastAPI), database, OSRM, OR-Tools, Docker Compose | Not started |
+
+### Calculation core
+
+The calculation core lives in `backend/synaplogix`:
 
 - **Data model and date rules.** Ready date and expiry date of every order.
 - **Data loading and validation.** A reproducible synthetic scenario generator with a fixed seed.
-- **Distances.** Estimated road distances between the 67 points (Mataró and 66 destinations), computed as the Haversine distance × 1.25. This is the documented fallback for when the OSRM routing service is not available.
+- **Distances.** Estimated road distances between the 48 points (Mataró and 47 destinations), computed as the Haversine distance × 1.25. This is the documented fallback for when the OSRM routing service is not available.
 - **Clarke-Wright savings algorithm.** Used as the reference solution.
 - **Simulated annealing.** An in-house metaheuristic that improves the reference solution with relocate, swap and 2-opt moves.
 - **Validation and indicators.** An independent validator that checks capacity, expiry and single assignment of every order, a lower bound on the number of trucks, and KPIs: trucks, km, cost, hours, load factor and expiry margin.
 
-The web interface (React, TypeScript and Leaflet) is in `frontend/`. Until the API exists it runs on its own with mock data and an in-browser port of the calculation core; see [frontend/README.md](frontend/README.md).
+### Web interface
 
-Not yet implemented: the REST API (FastAPI), the database (PostgreSQL), the OSRM routing engine, the OR-Tools solver and the Docker Compose setup.
+The web interface is in `frontend/` (React, TypeScript, Vite and Leaflet with OpenStreetMap tiles). It has the Home, Data, Fleet, Optimization, Results, Map and Compare screens, in Spanish and English, with dark and light themes, and a truck simulator on the map. Until the API exists it runs on its own: a mock service layer with the same entities and endpoints as the planned API, and an in-browser port of the calculation core. Setting `VITE_USE_MOCKS=false` connects it to the API. See [frontend/README.md](frontend/README.md), which also documents the API contract the backend has to implement.
+
+### Not implemented yet
+
+The REST API (FastAPI), the database, the OSRM routing engine, the OR-Tools solver and the Docker Compose setup. The project report plans PostgreSQL with the data model of its section 4.4; the class database (`BDIADelivery`, SQL Server) uses a different model in Spanish, so the backend will have to choose one and adapt the other.
 
 ## Repository structure
 
@@ -57,24 +69,44 @@ backend/
   measure_coverage.py    line coverage of the calculation core
   app/                   REST API (planned): api, core, optim and db packages
 data/
-  destinations.csv       Mataró (D000) and the 66 destinations (D001-D066) with GPS coordinates
+  destinations.csv       Mataró (D000) and the 47 mainland provincial capitals (D001-D047) with GPS coordinates
 docs/                    project documentation (planned)
-frontend/                web interface: React, TypeScript, Vite and Leaflet (see frontend/README.md)
+frontend/
+  src/                   screens, map and simulator, service layer (HTTP and mock), types and texts
+  e2e/                   Playwright acceptance tests (scenarios E1 and E5)
+  scripts/               build_mock_fixtures.py: mock data generated with backend/synaplogix
 ```
 
 The calculation core currently lives in `backend/synaplogix`. When the REST API is integrated, it will move to `backend/app/core` and `backend/app/optim`.
 
 ## Getting started
 
+### Calculation core
+
 You need Python 3.11 or later.
 
 ```bash
 cd backend
+python -m venv .venv                 # optional: a virtual environment (ignored by Git)
+.venv/Scripts/activate               # Windows; on macOS or Linux: source .venv/bin/activate
 pip install -r requirements.txt
-python -m pytest -q          # unit tests
-python measure_coverage.py   # line coverage of the calculation core
-python benchmark.py          # scenarios S1-S3 and scalability (about 4 minutes)
+python -m pytest -q                  # unit tests
+python measure_coverage.py           # line coverage of the calculation core
+python benchmark.py                  # scenarios S1-S3 and scalability (about 4 minutes)
 ```
+
+### Web interface
+
+You need Node.js 20 or later.
+
+```bash
+cd frontend
+npm install
+npm run dev                          # http://localhost:5173
+npm test                             # unit tests
+```
+
+If you change `data/destinations.csv`, run `npm run fixtures` in `frontend/` to rebuild the mock data.
 
 ## Input data
 
@@ -89,15 +121,17 @@ All files use a semicolon as the field separator and a dot as the decimal separa
 
 ## Results
 
-These results use a test fleet of 60,000 units per truck, 70 km/h and €1.10 per km, with no driving-time limit and estimated distances.
+These results come from `backend/benchmark.py` (`benchmark_results.json`). They use a test fleet of 60,000 units per truck, 70 km/h and €1.10 per km, with no driving-time limit, estimated distances and the 47 mainland provincial capitals. The simulated annealing runs for 10, 30 and 60 seconds in S1, S2 and S3.
 
-| Scenario | Orders | Clarke-Wright | Simulated annealing | Lower bound |
-|----------|-------:|--------------:|--------------------:|------------:|
-| S1       |     50 |     21 trucks |           21 trucks |          17 |
-| S2       |    200 |     76 trucks |           70 trucks |          64 |
-| S3       |    500 |    219 trucks |          195 trucks |         179 |
+| Scenario | Orders | Clarke-Wright | Simulated annealing | Lower bound | Infeasible orders |
+|----------|-------:|--------------:|--------------------:|------------:|------------------:|
+| S1       |     50 | 24 trucks · 35,994 km | 21 trucks · 33,178 km |          19 |  2 |
+| S2       |    200 | 95 trucks · 127,147 km | 85 trucks · 117,241 km |          76 | 16 |
+| S3       |    500 | 236 trucks · 324,785 km | 214 trucks · 296,482 km |         199 | 26 |
 
-No solution violates the capacity or expiry constraints. Some orders cannot reach their destination before expiring, even on a direct route, so they are reported as infeasible and excluded from the plan. This affects 10 orders in S1, 39 in S2 and 62 in S3 (see section 7.3 of the project report).
+No solution violates the capacity or expiry constraints. Infeasible orders cannot reach their destination before expiring, even on a direct route, so they are reported with their reason and excluded from the plan. The simulated annealing uses 9 to 13 % fewer trucks than Clarke-Wright.
+
+The project report (sections 7.3 to 7.5) still shows an earlier run that also included Portugal and Andorra; these are the current figures.
 
 ## Creators
 

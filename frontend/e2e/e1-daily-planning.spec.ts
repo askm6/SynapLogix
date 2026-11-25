@@ -10,11 +10,11 @@ test('E1: optimize S1 and review the results', async ({ page }) => {
   await page.getByRole('button', { name: 'Optimizar' }).click();
   await expect(page.getByText('Optimización terminada.')).toBeVisible({ timeout: 30_000 });
   // Same result as the Python core for S1 (section 7.3 of the report).
-  await expect(page.getByText(/21 camiones · 37\.076 km/)).toBeVisible();
+  await expect(page.getByText(/24 camiones · 35\.994 km/)).toBeVisible();
 
   await page.getByRole('button', { name: 'Ver resultados' }).click();
   await expect(page).toHaveURL(/\/resultados\/RUN/);
-  await expect(page.getByText('Pedidos inviables (10)')).toBeVisible();
+  await expect(page.getByText('Pedidos inviables (2)')).toBeVisible();
 
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Exportar rutas (CSV)' }).click();

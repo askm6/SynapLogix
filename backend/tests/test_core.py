@@ -46,8 +46,8 @@ def test_pu04_order_that_does_not_fit():
 
 def test_pu05_order_that_would_expire():
     products = {"R": Product("R", "Fast", 1.0, 1, 0)}  # expires on the same day it is ready
-    slow = Fleet(capacity_units=1000, speed_kmh=20, cost_per_km=1.0)  # Lisbon at 20 km/h takes more than 16 h
-    inst = Instance.build([make_order("X", "D058", [("R", 10)])], products, DIST, slow)
+    slow = Fleet(capacity_units=1000, speed_kmh=20, cost_per_km=1.0)  # A Coruña at 20 km/h takes more than 16 h
+    inst = Instance.build([make_order("X", "D001", [("R", 10)])], products, DIST, slow)
     assert inst.infeasible_orders() == {"X": WOULD_EXPIRE}
 
 
