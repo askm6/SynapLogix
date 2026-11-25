@@ -8,6 +8,7 @@ export const es = {
   'nav.fleet': 'Flota',
   'nav.optimize': 'Optimización',
   'nav.results': 'Resultados',
+  'nav.map': 'Mapa',
   'nav.compare': 'Comparar',
 
   'topbar.mock': 'Modo demo',
@@ -15,6 +16,10 @@ export const es = {
   'topbar.toLight': 'Cambiar a modo claro',
   'topbar.toDark': 'Cambiar a modo oscuro',
   'topbar.language': 'Idioma',
+  'topbar.reset': 'Restablecer demo',
+  'topbar.resetHint': 'Borra los escenarios, flotas y ejecuciones creados y vuelve a los datos iniciales.',
+  'topbar.resetConfirm':
+    '¿Borrar todos los escenarios, flotas y ejecuciones creados en el modo demo y empezar de cero?',
 
   'common.loading': 'Cargando…',
   'common.error': 'No se ha podido cargar la información.',
@@ -184,6 +189,8 @@ export const es = {
   'res.noRuns': 'No hay resultados todavía.',
   'res.goOptimize': 'Ir a Optimización',
   'res.map': 'Mapa de rutas',
+  'res.mapHint': 'Rutas por colores y simulador de camiones, en su propia pantalla.',
+  'res.openMap': 'Abrir mapa y simulador',
   'res.routes': 'Rutas y paradas',
   'res.infeasible': 'Pedidos inviables',
   'res.noInfeasible': 'Todos los pedidos se pueden servir.',
@@ -210,6 +217,9 @@ export const es = {
   'res.validation': 'Validación: ninguna ruta supera la capacidad ni llega después de la caducidad.',
   'res.validationFailed': 'El validador ha detectado restricciones incumplidas:',
   'res.depot': 'Mataró (depósito)',
+
+  'map.title': 'Mapa y simulador',
+  'map.toResults': 'Ver indicadores',
 
   'sim.title': 'Simulador',
   'sim.play': 'Reproducir',

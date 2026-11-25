@@ -33,6 +33,14 @@ export const router = createBrowserRouter([
         lazy: page(() => import('@/pages/ResultsPage').then((m) => ({ default: m.ResultsPage }))),
       },
       {
+        path: 'mapa',
+        lazy: page(() => import('@/pages/MapPage').then((m) => ({ default: m.MapPage }))),
+      },
+      {
+        path: 'mapa/:runId',
+        lazy: page(() => import('@/pages/MapPage').then((m) => ({ default: m.MapPage }))),
+      },
+      {
         path: 'comparar',
         lazy: page(() => import('@/pages/ComparePage').then((m) => ({ default: m.ComparePage }))),
       },

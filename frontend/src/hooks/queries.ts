@@ -42,16 +42,21 @@ export const useFleets = () => useQuery({ queryKey: keys.fleets, queryFn: api.fl
 export const useCurrentFleet = () => useQuery({ queryKey: keys.currentFleet, queryFn: api.fleet.current });
 export const useRuns = () => useQuery({ queryKey: keys.runs, queryFn: api.results.list });
 
-/** Polls GET /results/{run_id} every second while the run is queued or running (CU-05 progress bar). */
+const isFinished = (status: string | undefined) => status === 'done' || status === 'failed';
+
+/**
+ * Polls GET /results/{run_id} every second while the run is queued or running (CU-05 progress bar).
+ * A finished run never changes, so once it is done it is cached for good and never requested again:
+ * opening Results, Map or Compare reuses the same data instead of calling the API.
+ */
 export const useRun = (runId: string | null) =>
   useQuery({
     queryKey: keys.run(runId ?? ''),
     queryFn: () => api.results.get(runId!),
     enabled: !!runId,
-    refetchInterval: (query) => {
-      const status = query.state.data?.status;
-      return status === 'done' || status === 'failed' ? false : 1000;
-    },
+    staleTime: (query) => (isFinished(query.state.data?.status) ? Infinity : 0),
+    gcTime: 30 * 60_000,
+    refetchInterval: (query) => (isFinished(query.state.data?.status) ? false : 1000),
   });
 
 export function useGenerateScenario() {

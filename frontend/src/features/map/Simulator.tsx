@@ -110,12 +110,14 @@ const TruckList = memo(function TruckList({
   names,
   selected,
   onSelect,
+  maxHeight,
 }: {
   timelines: Timeline[];
   time: number;
   names: Map<string, string>;
   selected: string | null;
   onSelect: (routeId: string | null) => void;
+  maxHeight: number;
 }) {
   const { t } = useI18n();
   const states = timelines.map((tl, i) => ({ tl, i, state: truckStateAt(tl, time) }));
@@ -123,7 +125,7 @@ const TruckList = memo(function TruckList({
   const list = selected ? states.filter((s) => s.tl.route.route_id === selected) : states;
 
   return (
-    <div className="flex max-h-[600px] flex-col rounded-xl border border-line bg-glass-strong">
+    <div className="flex flex-col rounded-xl border border-line bg-glass-strong" style={{ maxHeight }}>
       <div className="flex items-center justify-between border-b border-line px-4 py-3">
         <span className="text-sm font-semibold">{t('sim.title')}</span>
         <Badge tone="accent">
@@ -161,11 +163,14 @@ export function Simulator({
   destinations,
   selected,
   onSelect,
+  mapHeight = 520,
 }: {
   timelines: Timeline[];
   destinations: Destination[];
   selected: string | null;
   onSelect: (routeId: string | null) => void;
+  /** Height of the map in px; the truck panel takes the same height. */
+  mapHeight?: number;
 }) {
   const { t, f } = useI18n();
   const { start, end } = useMemo(() => simulationBounds(timelines), [timelines]);
@@ -219,6 +224,7 @@ export function Simulator({
           selected={selected}
           onSelect={onSelect}
           clock={clock}
+          height={mapHeight}
         />
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-glass-strong px-3 py-2">
           <Button
@@ -276,7 +282,14 @@ export function Simulator({
           </div>
         </div>
       </div>
-      <TruckList timelines={timelines} time={uiTime} names={names} selected={selected} onSelect={onSelect} />
+      <TruckList
+        timelines={timelines}
+        time={uiTime}
+        names={names}
+        selected={selected}
+        onSelect={onSelect}
+        maxHeight={mapHeight + 64}
+      />
     </div>
   );
 }

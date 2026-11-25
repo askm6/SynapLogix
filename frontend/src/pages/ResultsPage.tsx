@@ -1,7 +1,10 @@
-/** Results screen (CU-06, CU-08): KPIs, map with simulator, routes and stops, infeasible orders, CSV export. */
+/**
+ * Results screen (CU-06, CU-08): KPIs, routes and stops, infeasible orders and CSV export.
+ * The map and the simulator live on their own screen (MapPage), opened from here.
+ */
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Download } from 'lucide-react';
+import { Download, Map as MapIcon } from 'lucide-react';
 import {
   Badge,
   Button,
@@ -14,13 +17,11 @@ import {
   Spinner,
   TableWrap,
 } from '@/components/ui';
-import { Simulator } from '@/features/map/Simulator';
 import { KpiGrid } from '@/features/results/KpiGrid';
 import { RoutesTable } from '@/features/results/RoutesTable';
 import { useDestinations, useRun, useRuns } from '@/hooks/queries';
 import { useI18n, type MessageKey } from '@/i18n';
 import { useUi } from '@/app/store';
-import { buildTimelines } from '@/lib/simulation';
 import { downloadText, kpisCsv, routesCsv } from '@/lib/csv';
 
 export function ResultsPage() {
@@ -38,10 +39,6 @@ export function ResultsPage() {
   const names = useMemo(
     () => new Map(destinations.data?.map((d) => [d.destination_id, d.name])),
     [destinations.data],
-  );
-  const timelines = useMemo(
-    () => (detail && destinations.data ? buildTimelines(detail.routes, detail.stops, destinations.data) : []),
-    [detail, destinations.data],
   );
 
   if (runs.isLoading) return <Spinner label={t('common.loading')} />;
@@ -118,28 +115,23 @@ export function ResultsPage() {
             )}
           </div>
 
-          <Card
-            solid
-            title={t('res.map')}
-            actions={
-              selected && (
-                <Badge tone="accent">
-                  {t('res.selected', {
-                    n: detail.routes.find((r) => r.route_id === selected)?.truck_number ?? '',
-                  })}
-                </Badge>
-              )
-            }
-          >
-            {destinations.data && (
-              <Simulator
-                key={detail.run.run_id}
-                timelines={timelines}
-                destinations={destinations.data}
-                selected={selected}
-                onSelect={setSelected}
-              />
-            )}
+          <Card solid>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="flex size-10 items-center justify-center rounded-xl bg-accent/15 text-accent-ink">
+                  <MapIcon className="size-5" aria-hidden />
+                </span>
+                <div>
+                  <h2 className="text-sm font-semibold text-fg">{t('res.map')}</h2>
+                  <p className="text-xs text-muted">{t('res.mapHint')}</p>
+                </div>
+              </div>
+              <Link to={`/mapa/${runId}`}>
+                <Button variant="primary" icon={<MapIcon className="size-4" />}>
+                  {t('res.openMap')}
+                </Button>
+              </Link>
+            </div>
           </Card>
 
           <Card

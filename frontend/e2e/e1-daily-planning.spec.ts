@@ -14,12 +14,18 @@ test('E1: optimize S1 and review the results', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Ver resultados' }).click();
   await expect(page).toHaveURL(/\/resultados\/RUN/);
-  await expect(page.locator('.leaflet-container')).toBeVisible();
   await expect(page.getByText('Pedidos inviables (10)')).toBeVisible();
 
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Exportar rutas (CSV)' }).click();
   expect((await download).suggestedFilename()).toMatch(/_routes\.csv$/);
+
+  // The map and the simulator live on their own screen.
+  await page.getByRole('button', { name: 'Abrir mapa y simulador' }).click();
+  await expect(page).toHaveURL(/\/mapa\/RUN/);
+  await expect(page.locator('.leaflet-container')).toBeVisible();
+  await page.getByRole('button', { name: 'Reproducir' }).click();
+  await expect(page.getByRole('button', { name: 'Pausa' })).toBeVisible();
 });
 
 test('E5: a file with an unknown product is rejected with its row', async ({ page }) => {

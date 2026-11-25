@@ -1,11 +1,23 @@
 /** Application shell: glass sidebar with the six screens, top bar with mode badge, theme and language. */
 import { useEffect } from 'react';
-import { NavLink, Outlet } from 'react-router';
-import { BarChart3, Database, GitCompare, Home, Moon, Route, Sun, Truck } from 'lucide-react';
+import { NavLink, Outlet, useNavigate } from 'react-router';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  BarChart3,
+  Database,
+  GitCompare,
+  Home,
+  Map as MapIcon,
+  Moon,
+  RotateCcw,
+  Route,
+  Sun,
+  Truck,
+} from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { Badge, cx } from '@/components/ui';
 import { useI18n, type MessageKey } from '@/i18n';
-import { USE_MOCKS } from '@/services';
+import { resetDemoData, USE_MOCKS } from '@/services';
 import { useUi } from './store';
 
 const NAV: { to: string; key: MessageKey; icon: typeof Home }[] = [
@@ -14,12 +26,25 @@ const NAV: { to: string; key: MessageKey; icon: typeof Home }[] = [
   { to: '/flota', key: 'nav.fleet', icon: Truck },
   { to: '/optimizacion', key: 'nav.optimize', icon: Route },
   { to: '/resultados', key: 'nav.results', icon: BarChart3 },
+  { to: '/mapa', key: 'nav.map', icon: MapIcon },
   { to: '/comparar', key: 'nav.compare', icon: GitCompare },
 ];
 
 export function Layout() {
   const { t, language } = useI18n();
-  const { theme, toggleTheme, setLanguage } = useUi();
+  const { theme, toggleTheme, setLanguage, setScenarioId, setRunId } = useUi();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  /** Demo mode only: forget every scenario, fleet and run created in the browser and start again. */
+  const resetDemo = () => {
+    if (!window.confirm(t('topbar.resetConfirm'))) return;
+    resetDemoData();
+    setScenarioId(null);
+    setRunId(null);
+    queryClient.clear();
+    navigate('/');
+  };
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
@@ -66,9 +91,19 @@ export function Layout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-end gap-2 px-4 pt-4 md:px-8">
           {USE_MOCKS && (
-            <span title={t('topbar.mockHint')}>
-              <Badge tone="warn">{t('topbar.mock')}</Badge>
-            </span>
+            <>
+              <span title={t('topbar.mockHint')}>
+                <Badge tone="warn">{t('topbar.mock')}</Badge>
+              </span>
+              <button
+                onClick={resetDemo}
+                className="glass flex h-8 items-center gap-1.5 rounded-xl px-2.5 text-xs text-muted hover:text-fg"
+                title={t('topbar.resetHint')}
+              >
+                <RotateCcw className="size-3.5" aria-hidden />
+                {t('topbar.reset')}
+              </button>
+            </>
           )}
           <div role="group" aria-label={t('topbar.language')} className="glass flex rounded-xl p-0.5 text-xs">
             {(['es', 'en'] as const).map((lang) => (

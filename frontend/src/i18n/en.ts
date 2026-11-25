@@ -10,6 +10,7 @@ export const en: Record<MessageKey, string> = {
   'nav.fleet': 'Fleet',
   'nav.optimize': 'Optimization',
   'nav.results': 'Results',
+  'nav.map': 'Map',
   'nav.compare': 'Compare',
 
   'topbar.mock': 'Demo mode',
@@ -17,6 +18,9 @@ export const en: Record<MessageKey, string> = {
   'topbar.toLight': 'Switch to light mode',
   'topbar.toDark': 'Switch to dark mode',
   'topbar.language': 'Language',
+  'topbar.reset': 'Reset demo',
+  'topbar.resetHint': 'Deletes the scenarios, fleets and runs you created and goes back to the initial data.',
+  'topbar.resetConfirm': 'Delete every scenario, fleet and run created in demo mode and start from scratch?',
 
   'common.loading': 'Loading…',
   'common.error': 'The information could not be loaded.',
@@ -186,6 +190,8 @@ export const en: Record<MessageKey, string> = {
   'res.noRuns': 'There are no results yet.',
   'res.goOptimize': 'Go to Optimization',
   'res.map': 'Route map',
+  'res.mapHint': 'Color-coded routes and the truck simulator, on their own screen.',
+  'res.openMap': 'Open map and simulator',
   'res.routes': 'Routes and stops',
   'res.infeasible': 'Infeasible orders',
   'res.noInfeasible': 'Every order can be served.',
@@ -212,6 +218,9 @@ export const en: Record<MessageKey, string> = {
   'res.validation': 'Validation: no route exceeds the capacity or arrives after the expiry date.',
   'res.validationFailed': 'The validator found violated constraints:',
   'res.depot': 'Mataró (depot)',
+
+  'map.title': 'Map and simulator',
+  'map.toResults': 'View indicators',
 
   'sim.title': 'Simulator',
   'sim.play': 'Play',

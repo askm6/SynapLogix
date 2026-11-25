@@ -1,6 +1,6 @@
 # SynapLogix frontend
 
-Web interface of SynapLogix, built with React, TypeScript and Vite. It covers the six screens of section 5.5 of the project report, shows the routes on a Leaflet map with OpenStreetMap tiles and animates them with a truck simulator.
+Web interface of SynapLogix, built with React, TypeScript and Vite. It covers the six screens of section 5.5 of the project report plus a dedicated map screen, shows the routes on a Leaflet map with OpenStreetMap tiles and animates them with a truck simulator.
 
 The interface is available in **Spanish (default)** and **English**, in **dark mode (default)** and light mode, with the SynapLogix identity: black or white background and the `#3AA7FF` accent.
 
@@ -43,10 +43,13 @@ npm run dev               # http://localhost:5173
 | `/datos` | Data | CU-01, CU-02 | Scenarios and their orders; CSV/Excel import with row-by-row validation errors; synthetic scenario generator with seed (S1-S3 templates); product and destination catalog |
 | `/flota` | Fleet | CU-04 | Capacity, average speed, cost per km and optional driving-hours limit (ERR-08 validation); saved configurations |
 | `/optimizacion` | Optimization | CU-05 | Scenario, algorithm (Clarke-Wright, OR-Tools, Metaheuristic), time limit and progress bar |
-| `/resultados/:runId` | Results | CU-06, CU-08 | KPIs, validator outcome, map with one color per route and the simulator, routes and stops table, infeasible orders with their reason, CSV export |
+| `/resultados/:runId` | Results | CU-06, CU-08 | KPIs, validator outcome, routes and stops table, infeasible orders with their reason, CSV export, and a link to the map |
+| `/mapa/:runId` | Map | CU-06 | Full-height map with one color per route and the truck simulator |
 | `/comparar` | Compare | CU-07 | 2 to 4 saved runs side by side, best value per indicator, difference from the reference and charts |
 
-### Simulator
+### Map and simulator
+
+The map and the simulator have their own screen (`/mapa`), opened from Results or from the sidebar. Results stays light (indicators and tables only), and the map only loads when it is opened. A finished run never changes, so it is loaded once and kept in the cache: moving between Results, Map and Compare does not call the API again.
 
 The simulator plays the trucks of a run in simulated time: play, pause, restart, speed (1 to 24 simulated hours per second) and a time slider. Each truck leaves Mataró at its departure time, reaches each stop at its estimated arrival and returns to Mataró. Between two points its position is interpolated linearly in time. The trucks move at the full frame rate on their own canvas layer; the clock, the slider and the side panel refresh five times per second. The side panel shows, for each truck, its status, delivered stops, next stop, estimated arrival and expiry margin, in orange below 6 hours. Clicking a route, a truck or a table row selects it on the map.
 
@@ -135,7 +138,7 @@ With `VITE_USE_MOCKS=true` the app works on its own:
 - **Solver.** `services/mocks/solver/core.ts` is a port of `backend/synaplogix/routing.py` and `models.py`: date rules, infeasible orders, Clarke-Wright, simulated annealing, validator and KPIs. It runs in a Web Worker so the interface stays responsive. Clarke-Wright reproduces the Python core exactly on S1 (21 trucks, 37,075.8 km, €40,783.34); a unit test checks it against `reference_s1.json`. The simulated annealing uses the same moves but its own random generator, so its results can differ slightly from Python.
 - **OR-Tools** cannot run in the browser. In mock mode it runs the metaheuristic, and the results screen says so.
 - **Generated scenarios** use the same rules as `data.py` with a different random generator: the same seed always gives the same scenario, but not the same orders as the Python generator.
-- **Persistence.** Saved fleets, runs and scenario parameters are kept in `localStorage` (`synaplogix.mock.v1`). Generated scenarios are rebuilt from their seed instead of being stored. Delete that key to start again from the fixtures.
+- **Persistence.** Saved fleets, runs and scenario parameters are kept in `localStorage` (`synaplogix.mock.v1`). Generated scenarios are rebuilt from their seed instead of being stored. The **Reset demo** button in the top bar deletes all of it and starts again from the fixtures.
 
 ## Decisions
 
