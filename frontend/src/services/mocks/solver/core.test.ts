@@ -1,6 +1,7 @@
 /**
  * The TypeScript port must reproduce the Python core on scenario S1: same infeasible orders and,
- * for the deterministic Clarke-Wright, the same KPIs (reference_s1.json is written by the Python core).
+ * for the deterministic Clarke-Wright, the same routes and KPIs (reference_s1.json is written by the
+ * Python core with scripts/build_mock_fixtures.py; rerun it whenever data/destinations.csv changes).
  */
 import { describe, expect, it } from 'vitest';
 import type { Destination, FleetConfig, Order, OrderLine, Product } from '@/types/entities';
@@ -41,12 +42,16 @@ describe('mock solver (port of backend/synaplogix)', () => {
     expect(infeasible).toEqual(reference.infeasible);
   });
 
-  it('reproduces Clarke-Wright on S1 exactly', () => {
+  it('reproduces Clarke-Wright on S1 (same routes, km and cost)', () => {
     const inst = buildInstance(input);
     const infeasible = infeasibleOrders(inst);
     const feasible = inst.orderIds.filter((o) => !infeasible.has(o));
     const routes = clarkeWright(inst, feasible);
-    expect(routes).toEqual(reference.routes);
+    // JavaScript and Python can differ in the last digit of sin/cos, which may flip an exact tie
+    // between a route and its reverse (same stops, same km). Compare routes regardless of direction.
+    const canonical = (rs: string[][]) =>
+      rs.map((r) => [r.join('>'), [...r].reverse().join('>')].sort()[0]).sort();
+    expect(canonical(routes)).toEqual(canonical(reference.routes));
     const km = routes.reduce((sum, r) => sum + evaluate(inst, r).km, 0);
     expect(Math.round(km * 10) / 10).toBe(reference.clarke_wright.km);
     expect(validateSolution(inst, routes, feasible)).toEqual([]);

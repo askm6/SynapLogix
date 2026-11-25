@@ -4,7 +4,7 @@
 
 Delivery planning and route optimization platform for perishable goods.
 
-SynapLogix is being developed for IA DELIVERY SL, a manufacturer of short-shelf-life food products based in Mataró (Barcelona). The company currently outsources its deliveries and wants to bring them in-house with the smallest possible fleet of its own trucks. SynapLogix calculates the minimum number of trucks needed to serve every order across mainland Spain, mainland Portugal and Andorra, and guarantees that each order arrives before its most perishable product expires.
+SynapLogix is being developed for IA DELIVERY SL, a manufacturer of short-shelf-life food products based in Mataró (Barcelona). The company currently outsources its deliveries and wants to bring them in-house with the smallest possible fleet of its own trucks. SynapLogix calculates the minimum number of trucks needed to serve every order across mainland Spain, and guarantees that each order arrives before its most perishable product expires.
 
 ## The problem
 
@@ -33,7 +33,7 @@ The calculation core is implemented in Python and covered by unit tests:
 
 - **Data model and date rules.** Ready date and expiry date of every order.
 - **Data loading and validation.** A reproducible synthetic scenario generator with a fixed seed.
-- **Distances.** Estimated road distances between the 67 points (Mataró and 66 destinations), computed as the Haversine distance × 1.25. This is the documented fallback for when the OSRM routing service is not available.
+- **Distances.** Estimated road distances between the 48 points (Mataró and 47 destinations), computed as the Haversine distance × 1.25. This is the documented fallback for when the OSRM routing service is not available.
 - **Clarke-Wright savings algorithm.** Used as the reference solution.
 - **Simulated annealing.** An in-house metaheuristic that improves the reference solution with relocate, swap and 2-opt moves.
 - **Validation and indicators.** An independent validator that checks capacity, expiry and single assignment of every order, a lower bound on the number of trucks, and KPIs: trucks, km, cost, hours, load factor and expiry margin.
@@ -57,7 +57,7 @@ backend/
   measure_coverage.py    line coverage of the calculation core
   app/                   REST API (planned): api, core, optim and db packages
 data/
-  destinations.csv       Mataró (D000) and the 66 destinations (D001-D066) with GPS coordinates
+  destinations.csv       Mataró (D000) and the 47 mainland provincial capitals (D001-D047) with GPS coordinates
 docs/                    project documentation (planned)
 frontend/                web interface: React, TypeScript, Vite and Leaflet (see frontend/README.md)
 ```
@@ -93,11 +93,11 @@ These results use a test fleet of 60,000 units per truck, 70 km/h and €1.10 pe
 
 | Scenario | Orders | Clarke-Wright | Simulated annealing | Lower bound |
 |----------|-------:|--------------:|--------------------:|------------:|
-| S1       |     50 |     21 trucks |           21 trucks |          17 |
-| S2       |    200 |     76 trucks |           70 trucks |          64 |
-| S3       |    500 |    219 trucks |          195 trucks |         179 |
+| S1       |     50 |     24 trucks |           21 trucks |          19 |
+| S2       |    200 |     95 trucks |           85 trucks |          76 |
+| S3       |    500 |    236 trucks |          214 trucks |         199 |
 
-No solution violates the capacity or expiry constraints. Some orders cannot reach their destination before expiring, even on a direct route, so they are reported as infeasible and excluded from the plan. This affects 10 orders in S1, 39 in S2 and 62 in S3 (see section 7.3 of the project report).
+No solution violates the capacity or expiry constraints. Some orders cannot reach their destination before expiring, even on a direct route, so they are reported as infeasible and excluded from the plan. This affects 2 orders in S1, 16 in S2 and 26 in S3. These figures use the 47 mainland provincial capitals; the project report (section 7.3) still shows an earlier run that also included Portugal and Andorra.
 
 ## Author
 
