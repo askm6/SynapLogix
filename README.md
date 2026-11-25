@@ -133,6 +133,6 @@ No solution violates the capacity or expiry constraints. Infeasible orders canno
 
 The project report (sections 7.3 to 7.5) still shows an earlier run that also included Portugal and Andorra; these are the current figures.
 
-## Author
+## Creators
 
-Maxime Pol Marcet
+Adam Serroukh Kharchich, Marvin Esteban Gonzales & Maxime Pol Marcet
