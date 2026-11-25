@@ -1,0 +1,127 @@
+@import 'tailwindcss';
+
+/* Dark mode is the default and is driven by the .dark class on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* SynapLogix identity (RNF-08): black or white background and #3AA7FF accent. */
+:root {
+  --bg: #f4f6f9;
+  --fg: #0b1220;
+  --muted: #566274;
+  --line: rgb(15 23 42 / 0.09);
+  --glass: rgb(255 255 255 / 0.62);
+  --glass-strong: rgb(255 255 255 / 0.85);
+  --accent: #3aa7ff;
+  /* Accent used as text on light backgrounds (4.6:1 on white); #3AA7FF itself is too light for text. */
+  --accent-ink: #0a6fc2;
+  --on-accent: #03111f;
+  --ok: #138a4f;
+  --warn: #a35d00;
+  --danger: #c22f3a;
+  --glow: rgb(58 167 255 / 0.18);
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #04060a;
+  --fg: #e7edf5;
+  --muted: #95a3b6;
+  --line: rgb(255 255 255 / 0.08);
+  --glass: rgb(255 255 255 / 0.045);
+  --glass-strong: rgb(16 21 30 / 0.85);
+  --accent-ink: #3aa7ff;
+  --ok: #3ccf8e;
+  --warn: #f5b041;
+  --danger: #ff6b76;
+  --glow: rgb(58 167 255 / 0.14);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-glass: var(--glass);
+  --color-glass-strong: var(--glass-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-on-accent: var(--on-accent);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@utility glass {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+@utility glass-strong {
+  background: var(--glass-strong);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  /* Soft accent glows give the glass panels something to blur. */
+  background-image:
+    radial-gradient(60rem 40rem at 85% -10%, var(--glow), transparent 60%),
+    radial-gradient(50rem 30rem at -10% 110%, var(--glow), transparent 60%);
+  background-attachment: fixed;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* OpenStreetMap tiles in dark mode: invert the light tiles instead of using a paid dark style. */
+.dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.6);
+}
+.leaflet-container {
+  background: var(--bg);
+  font-family: var(--font-sans);
+}
+.leaflet-control-attribution {
+  background: var(--glass-strong) !important;
+  color: var(--muted) !important;
+}
+.leaflet-control-attribution a {
+  color: var(--accent-ink) !important;
+}
+.leaflet-bar a {
+  background: var(--glass-strong) !important;
+  color: var(--fg) !important;
+  border-color: var(--line) !important;
+}
+.leaflet-tooltip {
+  background: var(--glass-strong);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
