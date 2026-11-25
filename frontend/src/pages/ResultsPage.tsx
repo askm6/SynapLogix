@@ -119,6 +119,7 @@ export function ResultsPage() {
           </div>
 
           <Card
+            solid
             title={t('res.map')}
             actions={
               selected && (

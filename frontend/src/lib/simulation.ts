@@ -101,6 +101,34 @@ export function simulationBounds(timelines: Timeline[]): { start: number; end: n
   return Number.isFinite(start) ? { start, end } : { start: 0, end: 0 };
 }
 
+/**
+ * Simulated clock shared by the simulator and the truck layer. Setting the time notifies listeners
+ * directly, without a React render, so the trucks can move at full frame rate while the rest of the
+ * interface refreshes a few times per second.
+ */
+export class SimClock {
+  private time: number;
+  private readonly listeners = new Set<(t: number) => void>();
+
+  constructor(start: number) {
+    this.time = start;
+  }
+
+  get(): number {
+    return this.time;
+  }
+
+  set(t: number): void {
+    this.time = t;
+    for (const listener of this.listeners) listener(t);
+  }
+
+  subscribe(listener: (t: number) => void): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+}
+
 /** Distinct, evenly spread colors per route (golden-angle hues). */
 export function routeColor(index: number): string {
   return `hsl(${Math.round((205 + index * 137.508) % 360)} 78% 58%)`;

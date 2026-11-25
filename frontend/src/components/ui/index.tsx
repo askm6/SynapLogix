@@ -16,15 +16,27 @@ export function Card({
   children,
   className,
   padded = true,
+  solid = false,
 }: {
   title?: ReactNode;
   actions?: ReactNode;
   children: ReactNode;
   className?: string;
   padded?: boolean;
+  /**
+   * Opaque panel without the backdrop blur. Use it around content that repaints constantly (the
+   * animated map), where re-blurring the background on every frame would cost frame rate.
+   */
+  solid?: boolean;
 }) {
   return (
-    <section className={cx('glass rounded-2xl shadow-[0_1px_0_0_rgb(255_255_255/0.04)_inset]', className)}>
+    <section
+      className={cx(
+        'rounded-2xl shadow-[0_1px_0_0_rgb(255_255_255/0.04)_inset]',
+        solid ? 'border border-line bg-glass-strong' : 'glass',
+        className,
+      )}
+    >
       {(title || actions) && (
         <header className="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-2">
           {title && <h2 className="text-sm font-semibold tracking-wide text-fg">{title}</h2>}

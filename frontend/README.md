@@ -48,7 +48,7 @@ npm run dev               # http://localhost:5173
 
 ### Simulator
 
-The simulator plays the trucks of a run in simulated time: play, pause, restart, speed (1 to 24 simulated hours per second) and a time slider. Each truck leaves Mataró at its departure time, reaches each stop at its estimated arrival and returns to Mataró. Between two points its position is interpolated linearly in time. The side panel shows, for each truck, its status, delivered stops, next stop, estimated arrival and expiry margin, in orange below 6 hours. Clicking a route, a truck or a table row selects it on the map.
+The simulator plays the trucks of a run in simulated time: play, pause, restart, speed (1 to 24 simulated hours per second) and a time slider. Each truck leaves Mataró at its departure time, reaches each stop at its estimated arrival and returns to Mataró. Between two points its position is interpolated linearly in time. The trucks move at the full frame rate on their own canvas layer; the clock, the slider and the side panel refresh five times per second. The side panel shows, for each truck, its status, delivered stops, next stop, estimated arrival and expiry margin, in orange below 6 hours. Clicking a route, a truck or a table row selects it on the map.
 
 Without OSRM the routes are drawn as straight lines between stops. When the API returns a road `geometry` for a route, the map draws it instead.
 
@@ -151,6 +151,7 @@ With `VITE_USE_MOCKS=true` the app works on its own:
 | React Router with lazy-loaded screens | One bundle | The map, the charts and SheetJS only download when their screen opens |
 | SheetJS from its official CDN | `xlsx` from npm | The npm package is no longer updated and has known vulnerabilities |
 | TanStack Table and TanStack Virtual | Plain tables | Sorting, filtering and tens of thousands of rows without slowing down (RNF-02) |
+| Simulator: canvas map, trucks moved outside React, side panel refreshed 5 times per second | Re-render the map every frame | Each animation frame costs under 1 ms of JavaScript with 203 trucks (scenario S3), instead of re-rendering every route; the panel around the map has no backdrop blur so the GPU does not re-blur it on every frame |
 | Map wheel zoom off | On | Scrolling the page never gets stuck on the map; zoom with the buttons or a double click |
 | Dark tiles by CSS filter on OpenStreetMap | Paid dark map styles | No API keys (requirement of the brief) |
 
