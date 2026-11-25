@@ -38,7 +38,7 @@ The calculation core is implemented in Python and covered by unit tests:
 - **Simulated annealing.** An in-house metaheuristic that improves the reference solution with relocate, swap and 2-opt moves.
 - **Validation and indicators.** An independent validator that checks capacity, expiry and single assignment of every order, a lower bound on the number of trucks, and KPIs: trucks, km, cost, hours, load factor and expiry margin.
 
-Not yet implemented: the REST API (FastAPI), the web interface (React and Leaflet), the OSRM routing engine and the OR-Tools solver.
+Not yet implemented: the REST API (FastAPI), the database (PostgreSQL), the web interface (React and Leaflet), the OSRM routing engine, the OR-Tools solver and the Docker Compose setup.
 
 ## Repository structure
 
@@ -53,9 +53,14 @@ backend/
   benchmark.py           scenarios S1-S3 and scalability test (writes benchmark_results.json)
   benchmark_results.json results of the latest benchmark run
   measure_coverage.py    line coverage of the calculation core
+  app/                   REST API (planned): api, core, optim and db packages
 data/
   destinations.csv       Mataró (D000) and the 66 destinations (D001-D066) with GPS coordinates
+docs/                    project documentation (planned)
+frontend/                web interface (planned)
 ```
+
+The calculation core currently lives in `backend/synaplogix`. When the REST API is integrated, it will move to `backend/app/core` and `backend/app/optim`.
 
 ## Getting started
 
